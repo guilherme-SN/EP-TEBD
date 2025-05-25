@@ -2,6 +2,13 @@
 
 ## CBIR - Libras
 
+### Como rodar?
+1. Baixe o docker/docker-compose
+2. Para rodar o Milvus: execute o comando `docker-compose up -d` na raiz do projeto
+3. Para rodar o Attu (Interface gráfica): execute o comando `docker run --name attu -p 8000:3000 -e HOST_URL=http://{IPV4}:8000 -e MILVUS_URL=http://{IPV4}:19530 zilliz/attu:v2.5.6`
+   - Troque o `IPV4` pelo seu IPV4
+4. Para rodar o FastAPI: execute o comando `uvicorn api.endpoints:router --host 0.0.0.0 --port 8080 --reload`
+   
 ### Estrutura do projeto
 ```
 EP-TEBD/  
