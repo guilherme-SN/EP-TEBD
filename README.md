@@ -8,14 +8,17 @@
 3. Para rodar o Attu (Interface gráfica): execute o comando `docker run --name attu -p 8000:3000 -e HOST_URL=http://{IPV4}:8000 -e MILVUS_URL=http://{IPV4}:19530 zilliz/attu:v2.5.6`
    - Troque o `IPV4` pelo seu IPV4
 4. Para rodar o FastAPI: execute o comando `uvicorn api.endpoints:router --host 0.0.0.0 --port 8080 --reload`
+5. Para baixar o dataset com as images:
+   - Baixe do kaggle pelo link: `https://www.kaggle.com/datasets/williansoliveira/libras`
+   - Coloque as pastas `test/` e `train/` dentro de `data/`
    
 ### Estrutura do projeto
 ```
 EP-TEBD/  
 │
-├── data/                  # Dados brutos e processados
-│   ├── raw/               # Imagens originais (ex.: A.jpg, B.jpg)
-│   └── processed/         # Imagens pré-processadas (redimensionadas/normalizadas)
+├── data/                 # Dados brutos e processados
+│   ├── train/            # Imagens para treinar os modelos
+│   └── test/             # Imagens para testar os modelos
 │
 ├── models/               # Modelos de ML e embeddings
 │   ├── embeddings/       # Vetores salvos (.npy ou similares)
