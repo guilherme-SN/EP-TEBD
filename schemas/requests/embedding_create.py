@@ -6,4 +6,4 @@ class EmbeddingCreate(BaseModel):
     """Schema para criação de embeddings"""
     embedding: List[float]                  # Lista de 128 floats (por exemplo)
     label: str                              # Ex: "letra_A"
-    source: Optional[str] = "user_upload"   # Origem do dado
+    source: Optional[str] = "dataset"       # Origem do dado

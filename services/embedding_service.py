@@ -1,6 +1,7 @@
 import logging
 import os
 import uuid
+import asyncio
 from typing import Any
 
 from fastapi import UploadFile
@@ -21,19 +22,22 @@ class EmbeddingService(MilvusClient):
     def __init__(self, collection_name: str = "libras_embeddings"):
         super().__init__()
         self.collection = self.get_collection(collection_name)
-        self.embedding_extractor = EmbeddingExtractor("models/resnet50.h5")
+        self.embedding_extractor = EmbeddingExtractor(embedding_model_path="models/libras_embedding_model.h5")
 
-    def create_embedding(self, data: EmbeddingCreate) -> EmbeddingResponse:
+    async def create_embedding(self, data: EmbeddingCreate) -> EmbeddingResponse:
         """Valida e cria embedding com metadados"""
         if len(data.embedding) != 128:
             raise ValueError("Dimensão do vetor inválida")
 
         # Insere no Milvus
-        result = self.collection.insert([{
+        insert_data = [{
             "embedding": data.embedding,
             "label": data.label,
             "source": data.source
-        }])
+        }]
+
+        result = await asyncio.to_thread(self.collection.insert, insert_data)
+
         logger.info(f"Embedding criado com ID: {result.primary_keys[0]}")
 
         return EmbeddingResponse(
@@ -118,7 +122,7 @@ class EmbeddingService(MilvusClient):
             if os.path.exists(temporary_image_path):
                 os.remove(temporary_image_path)
 
-    async def delete_by_id(self, embedding_id: int) -> dict[str, str | Any] | None:
+    def delete_by_id(self, embedding_id: int) -> dict[str, str | Any] | None:
         """Deleta a entidade da coleção pelo ID"""
         if not embedding_id:
             return None
