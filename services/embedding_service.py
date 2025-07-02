@@ -43,6 +43,7 @@ class EmbeddingService(MilvusClient):
         return EmbeddingResponse(
             id=result.primary_keys[0],
             label=data.label,
+            source=result.get("source"),
             status="created"
         )
 
@@ -99,7 +100,7 @@ class EmbeddingService(MilvusClient):
                 anns_field="embedding",                 # Nome do campo para comparar os embeddings
                 param=search_parameters,                # Parâmetros específicos para busca
                 limit=top_k,                            # Retorna apenas os top K mais similares
-                output_fields=["label"]                 # Metadados de retorno
+                output_fields=["label", "source"]       # Metadados de retorno
             )
 
             results_list = []
@@ -108,6 +109,7 @@ class EmbeddingService(MilvusClient):
                     EmbeddingResponse(
                         id=result.id,
                         label=result.entity.get('label'),
+                        source=result.entity.get('source'),
                         status="found",
                         distance=result.distance
                     )

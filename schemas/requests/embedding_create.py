@@ -4,6 +4,6 @@ from pydantic import BaseModel
 # Modelo para criação de embeddings
 class EmbeddingCreate(BaseModel):
     """Schema para criação de embeddings"""
-    embedding: List[float]                  # Lista de 128 floats (por exemplo)
-    label: str                              # Ex: "letra_A"
-    source: Optional[str] = "dataset"       # Origem do dado
+    embedding: List[float]
+    label: str
+    source: Optional[str] = "dataset"

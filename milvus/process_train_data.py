@@ -1,16 +1,20 @@
 import os
 import asyncio
+import logging
 from tqdm.asyncio import tqdm
 
 from schemas.requests.embedding_create import EmbeddingCreate
 from services.embedding_service import EmbeddingService
 
+# Configura o Logger
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 async def process_images_in_directory(service: EmbeddingService, base_directory: str):
     """Percorre o diretório, extrai embeddings e salva no banco"""
-    print(f"Iniciando varredura no diretório: {base_directory}")
+    logger.info(f"Iniciando varredura no diretório: {base_directory}")
 
-    # Collect all image paths and labels first
+    # Coleta todos caminhos das imagens primeiro
     all_images = []
     all_labels = []
     
@@ -22,7 +26,8 @@ async def process_images_in_directory(service: EmbeddingService, base_directory:
             
         letter = letter_folder.upper()
         image_files = [f for f in os.listdir(letter_path) if f.lower().endswith('.png')]
-        print(f"Encontrada letra: {letter} ({len(image_files)} imagens)")
+
+        logger.info(f"Encontrada letra: {letter} ({len(image_files)} imagens)")
         
         for image_filename in image_files:
             image_number = os.path.splitext(image_filename)[0]
@@ -33,9 +38,9 @@ async def process_images_in_directory(service: EmbeddingService, base_directory:
             all_labels.append(label)
 
     total_images = len(all_images)
-    print(f"\nEncontradas {total_images} imagens. Processando em lotes...")
+    logger.info(f"\nEncontradas {total_images} imagens")
 
-    # Process in batches
+    # Processamento em batches
     batch_size = 16
     tasks = []
     
@@ -52,13 +57,13 @@ async def process_images_in_directory(service: EmbeddingService, base_directory:
         await f
 
 async def process_image_batch(service: EmbeddingService, image_paths: list[str], labels: list[str]):
-    # Extract embeddings in batch
+    """Extrai embeddings num batch de imagens e salva no banco"""
     embeddings = await asyncio.to_thread(
         service.embedding_extractor.extract_embeddings_batch,
         image_paths
     )
     
-    # Create tasks for saving to database
+    # Cria tasks para salvar no banco de dados
     save_tasks = []
     for embedding, label, image_path in zip(embeddings, labels, image_paths):
         embedding_create_data = EmbeddingCreate(
@@ -68,7 +73,7 @@ async def process_image_batch(service: EmbeddingService, image_paths: list[str],
         )
         save_tasks.append(service.create_embedding(embedding_create_data))
     
-    # Wait for all saves to complete
+    # Espera tudo ser salvo no banco
     await asyncio.gather(*save_tasks)
 
 
@@ -77,7 +82,7 @@ async def main():
     train_directory = "../data/train"
     await process_images_in_directory(EmbeddingService(), train_directory)
 
-    print("\nProcesso concluído com sucesso!")
+    logger.info("\nProcesso concluído com sucesso!")
 
 
 asyncio.run(main())

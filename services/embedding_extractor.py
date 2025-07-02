@@ -68,11 +68,11 @@ class EmbeddingExtractor:
             shuffle=False
         )
 
-        # Cria o modelo do zero
+        # Cria o modelo
         base_model = EfficientNetB0(weights=None, include_top=False, input_shape=(224, 224, 3))
         x = GlobalAveragePooling2D()(base_model.output)
         x = Dense(256, activation='relu')(x)
-        x = Dense(128, activation='relu')(x)  # Embedding final
+        x = Dense(128, activation='relu')(x)  # Vai ser o embedding final
         output = Dense(train_gen.num_classes, activation='softmax')(x)
 
         model = tf.keras.Model(inputs=base_model.input, outputs=output)
@@ -94,13 +94,16 @@ class EmbeddingExtractor:
         embedding_model.save(self.embedding_model_path)
         logger.info(f"Modelo de embeddings salvo em {self.embedding_model_path}")
 
+
     def extract_embedding(self, image_path: str) -> list[float]:
         img = image.load_img(image_path, target_size=(224, 224))
         img_array = image.img_to_array(img)
         img_array = np.expand_dims(img_array, axis=0)
         img_array = preprocess_input(img_array)
         extracted_embedding = self.predict_fn(img_array)
+
         return extracted_embedding.numpy()[0].tolist()
+
 
     def extract_embeddings_batch(self, image_paths: list[str], batch_size: int = 32) -> list[list[float]]:
         all_embeddings = []

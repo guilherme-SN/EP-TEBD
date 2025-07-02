@@ -32,7 +32,7 @@ async def create_embedding_from_image(
     )
 
 @router.post("/embeddings/search", response_model=EmbeddingSearchResponse)
-async def search_embeddings_endpoint(
+async def search_embeddings_by_image(
         image_file: UploadFile = File(...),
         top_k: int = Form(5),
         embedding_service: EmbeddingService = Depends(EmbeddingService)
