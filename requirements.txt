@@ -7,3 +7,7 @@ pydantic~=2.11.5
 pillow~=11.2.1
 scipy~=1.16.0
 python-multipart==0.0.20
+schemas~=0.7.1
+tqdm~=4.67.1
+pandas~=2.2.3
+scikit-learn~=1.7.0

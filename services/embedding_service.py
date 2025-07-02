@@ -22,7 +22,7 @@ class EmbeddingService(MilvusClient):
     def __init__(self, collection_name: str = "libras_embeddings"):
         super().__init__()
         self.collection = self.get_collection(collection_name)
-        self.embedding_extractor = EmbeddingExtractor(embedding_model_path="models/libras_embedding_model.h5")
+        self.embedding_extractor = EmbeddingExtractor(embedding_model_path="models/libras_embedding_model2.h5")
 
     async def create_embedding(self, data: EmbeddingCreate) -> EmbeddingResponse:
         """Valida e cria embedding com metadados"""

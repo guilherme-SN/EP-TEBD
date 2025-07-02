@@ -7,6 +7,7 @@ from tensorflow.keras.preprocessing import image
 from tensorflow.keras.preprocessing.image import ImageDataGenerator
 from tensorflow.keras.applications.efficientnet import preprocess_input, EfficientNetB0
 from tensorflow.keras.layers import GlobalAveragePooling2D, Dense
+from tensorflow.keras.callbacks import EarlyStopping
 
 # Configura o Logger
 logging.basicConfig(level=logging.INFO)
@@ -15,8 +16,8 @@ logger = logging.getLogger(__name__)
 class EmbeddingExtractor:
     def __init__(
             self,
-            embedding_model_path: str = "models/libras_embeddings_model.h5",
-            classifier_model_path: str = "models/libras_model.h5",
+            embedding_model_path: str = "models/libras_embeddings_model2.h5",
+            classifier_model_path: str = "models/libras_model2.h5",
             train_data_dir: str = "../data/train/"
     ):
         self.embedding_model_path = embedding_model_path
@@ -46,7 +47,7 @@ class EmbeddingExtractor:
             validation_split=0.2,
             rotation_range=20,
             zoom_range=0.2,
-            horizontal_flip=True
+            horizontal_flip=False
         )
 
         train_gen = datagen.flow_from_directory(
@@ -77,8 +78,10 @@ class EmbeddingExtractor:
         model = tf.keras.Model(inputs=base_model.input, outputs=output)
         model.compile(optimizer='adam', loss='categorical_crossentropy', metrics=['accuracy'])
 
+        early_stop = EarlyStopping(monitor='val_loss', patience=3, restore_best_weights=True)
+
         # Treinamento
-        model.fit(train_gen, validation_data=val_gen, epochs=10)
+        model.fit(train_gen, validation_data=val_gen, epochs=20, callbacks=[early_stop])
 
         # Salva modelo de classificação
         os.makedirs(os.path.dirname(self.classifier_model_path), exist_ok=True)
