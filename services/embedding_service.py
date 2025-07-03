@@ -16,6 +16,16 @@ from .embedding_extractor import EmbeddingExtractor
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
+
+def convert_to_url(database_path: str) -> str:
+    """Converte o caminho do banco de dados para uma URL estática"""
+    path = os.path.normpath(database_path)
+    parts = path.split(os.sep)
+    relative_path_url = "/".join(parts[2:])
+
+    return f"http://localhost:8080/static/{relative_path_url}"
+
+
 class EmbeddingService(MilvusClient):
     """Implementa operações CRUD"""
 
@@ -109,7 +119,7 @@ class EmbeddingService(MilvusClient):
                     EmbeddingResponse(
                         id=result.id,
                         label=result.entity.get('label'),
-                        source=result.entity.get('source'),
+                        source=convert_to_url(result.entity.get('source')),
                         status="found",
                         distance=result.distance
                     )
